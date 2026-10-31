@@ -15,14 +15,16 @@ def main():
     p.add_argument("--states", nargs="+", required=True, help="Two-digit state FIPS codes, e.g. 36 17")
     p.add_argument("--out", type=Path, required=True)
     args = p.parse_args()
+    api_key = os.getenv("CENSUS_API_KEY")
+    if not api_key:
+        raise SystemExit("CENSUS_API_KEY is required. Request a free key at https://api.census.gov/data/key_signup.html and export CENSUS_API_KEY=...")
     records = []
     for state in args.states:
         state = str(state).zfill(2)
         url = f"https://api.census.gov/data/{args.year}/acs/acs5"
         params = {"get": ",".join(VARIABLES), "for": "block group:*",
                   "in": f"state:{state} county:* tract:*"}
-        if os.getenv("CENSUS_API_KEY"):
-            params["key"] = os.environ["CENSUS_API_KEY"]
+        params["key"] = api_key
         resp = requests.get(url, params=params, timeout=180)
         resp.raise_for_status()
         rows = resp.json()
