@@ -1,0 +1,21 @@
+{
+  "model_id": "Qwen/Qwen3-VL-32B-Instruct",
+  "seed": 42,
+  "max_sat_images": 4,
+  "max_stv_images": 8,
+  "max_image_edge": 1024,
+  "max_new_tokens": 350,
+  "conditions": [
+    "SAT",
+    "STV",
+    "FUSION"
+  ],
+  "prompts": [
+    "open",
+    "standardized"
+  ],
+  "sat_dirname": "sat",
+  "stv_dirname": "stv",
+  "dtype": "bfloat16",
+  "device_map": "auto"
+}
