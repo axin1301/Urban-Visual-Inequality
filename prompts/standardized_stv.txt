@@ -1,0 +1,1 @@
+Inspect the supplied street-view images. Output exactly six numbered lines in this order: (1) Vegetation; (2) Built form; (3) Building condition; (4) Outdoor amenities; (5) Visible deterioration; (6) Variation across images. For each write one sentence of directly visible evidence or exactly "Not assessable". Do not infer SES or treat unobserved features as absent.
