@@ -1,0 +1,1 @@
+These are satellite images sampled from one census block group. Write a neutral 100–140 word paragraph describing only visually supported vegetation, built form, spatial arrangement, open spaces, and heterogeneity. Do not infer socioeconomic information. Output only the paragraph.
