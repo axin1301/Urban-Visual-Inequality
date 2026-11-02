@@ -1,0 +1,1 @@
+These are street-view photographs sampled from one census block group. Write a neutral 100–140 word paragraph describing visually supported vegetation, built form, visible facade condition, outdoor amenities, and variation across observed scenes. Do not infer socioeconomic information or extrapolate unseen conditions. Output only the paragraph.
