@@ -1,0 +1,5 @@
+# Install within a LUMI-supported ROCm PyTorch environment; do not install generic CUDA torch here.
+transformers>=4.57,<5
+accelerate>=1.10,<2
+pillow>=10,<12
+safetensors>=0.5
