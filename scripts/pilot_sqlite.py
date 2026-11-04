@@ -134,7 +134,8 @@ def main():
     p.add_argument("--config",type=Path,default=ROOT/"configs/pilot.json")
     p.add_argument("--out",type=Path,required=True)
     p.add_argument("--year",type=int,default=None,help="Optional filter on cbg.year in BOTH DBs")
-    p.add_argument("--max-cbgs",type=int,default=0,help="0 = all BGs; first N sorted for a smoke test")
+    p.add_argument("--max-cbgs",type=int,default=0,help="0 = all eligible BGs; first N eligible for smoke test")
+    p.add_argument("--paired-only",action="store_true",help="Only CBGs with both SAT and STV")
     p.add_argument("--dry-run",action="store_true",help="Do not fetch BLOBs or load a model")
     args=p.parse_args()
     cfg=json.loads(args.config.read_text())
@@ -150,12 +151,17 @@ def main():
                         completed.add(obj["key"])
     with closing(connect_ro(args.sat_db)) as sat_db, closing(connect_ro(args.stv_db)) as stv_db:
         cbgs=list(all_cbgs(sat_db,stv_db,args.city,args.lookup))
-        if args.max_cbgs>0: cbgs=cbgs[:args.max_cbgs]
         # Metadata only: candidate IDs are cheap, and images remain in SQLite.
         tasks=[]
+        eligible=0
         for geoid in cbgs:
             sat=sat_candidates(sat_db,args.city,geoid,args.year)
             stv=stv_candidates(stv_db,args.city,geoid,args.year)
+            if args.paired_only and (not sat or not stv):
+                continue
+            eligible+=1
+            if args.max_cbgs and eligible>args.max_cbgs:
+                break
             sat_map={str(item["image_id"]):item for item in sat}
             stv_map={str(item["view_id"]):item for item in stv}
             sat_selected=[sat_map[v] for v in sample_ids(sat_map,cfg["max_sat_images"],cfg["seed"],geoid+":SAT")]
@@ -171,7 +177,7 @@ def main():
                         tasks.append(dict(key=key,city=args.city,geoid=geoid,
                                           year_filter=args.year,condition=condition,
                                           prompt_type=style,sat_records=a,stv_records=b))
-        print(f"City={args.city!r}; pool={len(cbgs)} CBGs; pending={len(tasks)} tasks",flush=True)
+        print(f"City={args.city!r}; full_pool={len(cbgs)} CBGs; eligible_scanned={min(eligible,args.max_cbgs) if args.max_cbgs else eligible}; pending={len(tasks)} tasks",flush=True)
         if not tasks:return
         model=processor=None
         if not args.dry_run: model,processor=model_setup(cfg)
